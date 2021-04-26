@@ -2,12 +2,15 @@
 #include <istream>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 
 #include "parser.h"
 #include "printTree.h"
 
 using namespace std;
 
+// TODO: Change invocation to be: "frontEnd [file]"
+// TODO: Account for the c-string error and <stdio.h> error Hauschild found in P1 (and fix it)
 int main(int argc, char *argv[])
 {
   // 1. Implement All Checks on inputs and stuff before calling parser
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
   }
 
   // 2. Call parser() from parser.cpp
-  parser(in);
+  parser(); // parser(in);
 
   // 3. Call printTree() from printTree.cpp
   printTree();
