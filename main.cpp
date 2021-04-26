@@ -73,7 +73,8 @@ int main(int argc, char *argv[])
   }
 
   // 2. Call parser() from parser.cpp
-  parser(); // parser(in);
+  Parser parser;
+  parser.parser(); // parser(in);
 
   // 3. Call printTree() from printTree.cpp
   printTree();

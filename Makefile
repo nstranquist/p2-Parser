@@ -13,5 +13,5 @@ parser.o: parser.cpp parser.h token.h table.h
 scanner.o: scanner.cpp scanner.h token.h table.h
 	g++ -c -Wall scanner.cpp
 
-printTree.o: printTree.cpp printTree.h parser.h
+printTree.o: printTree.cpp printTree.h
 	g++ -c -Wall printTree.cpp

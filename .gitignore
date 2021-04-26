@@ -1,3 +1,11 @@
 requirements.txt
 notes.txt
 .vscode
+test
+
+# output files
+parser
+main.o
+scanner.o
+parser.o
+printTree.o

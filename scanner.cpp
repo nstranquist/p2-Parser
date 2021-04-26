@@ -51,7 +51,7 @@ Token *Scanner::getToken(istream *input)
     if (this->isEndOfFile)
     {
       // cout << "end of file. returning null" << endl;
-      return NULL;
+      return NULL; // or '\0'
     }
     else if (input->peek() == EOF)
     {

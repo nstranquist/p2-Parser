@@ -1,11 +1,12 @@
 #include <istream>
 #include <iostream>
 
+#include "parser.h"
 // #include "scanner.h"
 
 using namespace std;
 
-int parser() // istream *input
+int Parser::parser() // istream *input
 {
   cout << "Parsing..." << endl;
 
@@ -16,23 +17,23 @@ int parser() // istream *input
 
 // Implement the Non-Terminal Functions (20)
 
-void program(){};
-void block(){};
-void vars(){};
-void expr(){};
+void Parser::program() {}
+void Parser::block() {}
+void Parser::vars() {}
+void Parser::expr() {}
 
-void N(){};
-void A(){};
-void M(){};
-void R(){};
-void stats(){};
-void mStat(){};
+void Parser::N() {}
+void Parser::A() {}
+void Parser::M() {}
+void Parser::R() {}
+void Parser::stats() {}
+void Parser::mStat() {}
 
-void in(){};
-void out(){};
-void _if(){};
-void loop(){};
-void assign(){};
-void RO(){};
-void label(){};
-void _goto(){};
+void Parser::in() {}
+void Parser::out() {}
+void Parser::_if() {}
+void Parser::loop() {}
+void Parser::assign() {}
+void Parser::RO() {}
+void Parser::label() {}
+void Parser::_goto() {}
