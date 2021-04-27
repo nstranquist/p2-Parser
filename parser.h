@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <istream>
+#include "token.h"
 
 using namespace std;
 
@@ -10,24 +11,25 @@ public:
 
 private:
   // Define nonterminal functions (as templates for now)
-  void program();
-  void block();
-  void vars();
-  void expr();
+  void program(Token *token);
+  void block(Token *token);
+  void vars(Token *token);
+  void expr(Token *token);
 
-  void N();
-  void A();
-  void M();
-  void R();
-  void stats();
-  void mStat();
+  void N(Token *token);
+  void A(Token *token);
+  void M(Token *token);
+  void R(Token *token);
+  void stats(Token *token);
+  void mStat(Token *token);
+  void stat(Token *token);
 
-  void in();
-  void out();
-  void _if();
-  void loop();
-  void assign();
-  void RO();
-  void label();
-  void _goto();
+  void in(Token *token);
+  void out(Token *token);
+  void _if(Token *token);
+  void loop(Token *token);
+  void assign(Token *token);
+  void RO(Token *token);
+  void label(Token *token);
+  void _goto(Token *token);
 };
