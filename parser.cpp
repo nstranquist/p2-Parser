@@ -2,17 +2,36 @@
 #include <iostream>
 
 #include "parser.h"
-// #include "scanner.h"
+#include "scanner.h"
 
 using namespace std;
 
-int Parser::parser() // istream *input
+void Parser::parser(istream *input)
 {
-  cout << "Parsing..." << endl;
+  cout << "1. Parsing...\n\n";
 
-  // while(Node n = getToken()) { ... }
+  Scanner scanner;
 
-  return 0;
+  string delimiterSpace = " ";
+
+  Token *token;
+
+  token = scanner.getToken(input);
+  while (token)
+  {
+    if (!token)
+    {
+      cout << "Error! Token not existent\n"
+           << endl;
+      break;
+    }
+    cout << "line " << token->lineNumber << ": "
+         << token->tokenInstance
+         << "\tid: " << token->tokenID << " "
+         << scanner.tokenNames[token->tokenID] << "\n"
+         << endl;
+    token = scanner.getToken(input);
+  }
 }
 
 // Implement the Non-Terminal Functions (20)

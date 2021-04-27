@@ -8,7 +8,7 @@ using namespace std;
 
 void printTree()
 {
-  cout << "Printing Tree" << endl;
+  cout << "2. Printing Tree...\n\n";
 
   // Print with Preorder traversal, with indentations, for testing purposes
   // printPreorder(node, 0);

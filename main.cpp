@@ -20,17 +20,16 @@ int main(int argc, char *argv[])
   if (argc == 1)
   {
     in = &cin;
-    cout << "Please enter the input for the program. Finish by entering a new line." << endl;
+    cout << "\n0. Please enter the input for the program. Finish by entering a new line." << endl;
   }
   // Argument given, open the file and use it
   else if (argc == 2)
   {
     string fileName = argv[1];
-    cout << "file given: " << fileName << endl;
     out.open(fileName);
     in = &out;
 
-    cout << "Reading your file..." << endl;
+    cout << "\n0. Reading your file...\n\n";
     if (!out.is_open())
     {
       // Before error, check if .fs is being added or not
@@ -63,7 +62,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      cout << "File has been opened successfully." << endl;
+      cout << "File has been opened successfully.\n\n";
     }
   }
   else
@@ -74,7 +73,7 @@ int main(int argc, char *argv[])
 
   // 2. Call parser() from parser.cpp
   Parser parser;
-  parser.parser(); // parser(in);
+  parser.parser(in);
 
   // 3. Call printTree() from printTree.cpp
   printTree();

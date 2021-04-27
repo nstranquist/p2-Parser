@@ -1,12 +1,13 @@
 #include <stdio.h>
+#include <istream>
 
 using namespace std;
 
 class Parser
 {
 public:
-  // Parser();
-  int parser(); // istream *input
+  void parser(istream *input); // TODO: change to the tree root Node
+
 private:
   // Define nonterminal functions (as templates for now)
   void program();
