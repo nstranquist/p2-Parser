@@ -16,7 +16,7 @@ public:
 
   void testTable();
 
-  string tokenNames[4] = {"Identifier", "Numeric", "Keyword", "Operator_Delimiter"}; // to match up with the enum values
+  string tokenNames[5] = {"Identifier", "Numeric", "Keyword", "Operator_Delimiter", "End of File"}; // to match up with the enum values
 
 private:
   int lineNumber = 1;

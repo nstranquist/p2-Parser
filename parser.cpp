@@ -11,18 +11,32 @@ using namespace std;
 void Parser::parser(istream *input)
 {
   cout << "1. Parsing...\n\n";
+  this->input = input;
 
   Scanner scanner;
 
-  string delimiterSpace = " ";
+  // Is this already our lookahead token, or do we get one more? --> This is the lookahead.
+  this->token = scanner.getToken(input);
 
-  Token *token;
+  program(); 
 
-  token = scanner.getToken(input);
+  if (token->tokenID == EOF_tk)
+  {
+    cout << "Parse was OK" << endl;
+  }
+  else
+  {
+    cout << "Error, EOF token not found" << endl;
+  }
+  // nextToken = scanner.getToken(input);
 
-  program(token);
+  // printToken(token);
+  // if (nextToken)
+  //   printToken(nextToken);
 
-  cout << "Finished Processing" << endl;
+  // program(token);
+
+  cout << "Finished Processing\n\n";
 
   // while (token)
   // {
@@ -43,88 +57,109 @@ void Parser::parser(istream *input)
 
 // Implement the Non-Terminal Functions (20) or 19
 
-void Parser::program(Token *token)
+void Parser::program()
 {
   // <vars>main<block>
   // 1. Call variables
   // 2. main? --> it's a "structural identifier", similar to "begin" and "end"
   // 3. Call block
 
-  vars(token);
-
-  block(token);
+  vars();
+  block();
 }
-void Parser::block(Token *token)
+void Parser::block()
 {
   // begin <vars><stats> end
+  vars();
+  cout << "\nskipping stats() to test vars()" << endl;
+  // stats();
 }
-void Parser::vars(Token *token)
+void Parser::vars()
 {
   // empty | data Identifier := Integer ; <vars>
-  // 1. data Identifier? empty?
-  // 2. Call vars
-  if (!token || token->tokenID == IDENT_tk)
+  // 1. If empty, return;
+  cout << "\ntoken instance: " << this->token->tokenInstance << endl;
+
+  if(this->token->tokenInstance == "") {
+    cout << "token in vars() is empty. returning" << endl;
     return;
-  vars(token);
+  }
+  // 2. If data identifier, process token, (see semi-colon?), call vars() again
+  else if (this->token->tokenID == IDENT_tk) {
+    // Do we still make sure it is an integer or something??
+    cout << "token in vars() is an identifier. Processing and getting next..." << endl;
+    token = this->getTokenFromScanner();
+    // process for semi-colon?
+    vars();
+  }
+  else {
+    cout << "Error: Token in vars() does not match the possible tokens" << endl;
+  }
 }
-void Parser::expr(Token *token)
+void Parser::expr()
 {
   // <N> - <expr> | <N>
   // 1. Calculate First Set
+  // firstSetOfN = {"*", "(", IDENT_tk, NUM_tk} // is * or R() -> (<expr) | Identifier | Integer
+  // string firstSetOfN = {"*", "("};
+  // so if firstSetOfN.includes(token->tokenInstace), call just N()
+
   // 2. Either <N> - <expr> or <N>
-  int choice = 1;
-  if (choice == 1)
+  if (this->token->tokenInstance == "*" || this->token->tokenInstance == "(")
   {
-    // return N() - expr();
+    cout << "need to call N and expr" << endl;
+    N();
+    cout << "expecting minus identifier" << endl;
+    expr();
   }
   else
-    N(token);
+    N();
 }
 
-void Parser::N(Token *token)
+void Parser::N()
 {
   // <A> / <N> | <A> * <N> | <A>
   // 1. Use lookahead to detect if / or *
   bool mult = false;
   bool div = false;
-  A(token);
+  A();
   if (mult || div)
   {
     // 1. handle / or * sign? terminal, so....
     // 2. Call N
-    N(token);
+    N();
   }
 }
-void Parser::A(Token *token)
+void Parser::A()
 {
   // <M> + <A> | <M>
   // 1. User First Sets and Lookahead to see if M + A or M
   bool useM = false;
-  M(token);
+  M();
   if (useM)
   {
     // handle '+'
-    A(token);
+    A();
   }
 }
-void Parser::M(Token *token)
+void Parser::M()
 {
   // * <M> | <R>
   // 1. if mult terminal, consume it and call M
   bool isMult = false;
   if (isMult)
-    M(token);
+    M();
   else
-    R(token);
+    R();
 }
-void Parser::R(Token *token)
+void Parser::R()
 {
   // (<expr) | Identifier | Integer
   // 1. If parens, call expr,
   bool isParens = false;
   if (isParens)
   {
-    expr(token);
+    expr();
   }
   else
   {
@@ -132,62 +167,65 @@ void Parser::R(Token *token)
     return;
   }
 }
-void Parser::stats(Token *token)
+void Parser::stats()
 {
   // <stat> <mStat>
-  stat(token);
-  mStat(token);
+  stat();
+  mStat();
 }
-void Parser::mStat(Token *token)
+void Parser::mStat()
 {
   // empty | <stat> <mStat>
   // 1. Use lookahead to detect EOF token
   bool isEOF = false;
-  if (isEOF)
+  if (isEOF || !token)
+  {
+    cout << "is EOF or token is empty" << endl;
     return;
-  stat(token);
-  mStat(token);
+  }
+  stat();
+  mStat();
 }
-void Parser::stat(Token *token)
+void Parser::stat()
 {
   // <in>; | <out>; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ;
   // 1. Calculate First (and Follow?) Sets?
 }
 
-void Parser::in(Token *token)
+void Parser::in()
 {
   // getter Identifier (??)
   cout << "getter Identifier" << endl;
 }
-void Parser::out(Token *token)
+void Parser::out()
 {
   // outter <expr>
   cout << "outer" << endl;
-  expr(token);
+  expr();
 }
-void Parser::_if(Token *token)
+void Parser::_if()
 {
   // if [ <expr> <RO> <expr> ] then <stat>
-  expr(token);
-  RO(token);
-  expr(token);
-  stat(token);
+  expr();
+  RO();
+  expr();
+  stat();
 }
-void Parser::loop(Token *token)
+void Parser::loop()
 {
   // loop [ <expr> <RO> <expr> ] <stat>
-  expr(token);
-  RO(token);
-  expr(token);
-  stat(token);
+  expr();
+  RO();
+  expr();
+  stat();
 }
-void Parser::assign(Token *token)
+void Parser::assign()
 {
   // assign Identifier := <expr>
   cout << "assign Identifier" << endl;
-  expr(token);
+  expr();
 }
-void Parser::RO(Token *token)
+void Parser::RO()
 {
   // => | =< | == | [==] (3 tokens) | %
   string example = "=>";
@@ -218,13 +256,66 @@ void Parser::RO(Token *token)
          << endl;
   }
 }
-void Parser::label(Token *token)
+void Parser::label()
 {
   // void Identifier
   cout << "void Identifier" << endl;
 }
-void Parser::_goto(Token *token)
+void Parser::_goto()
 {
   // proc Identifier
   cout << "proc Identifier" << endl;
 }
+
+void Parser::printToken(Token *token)
+{
+  Scanner scanner;
+
+  if (!token)
+    cout << "LOL that token doesn't exist." << endl;
+  else
+  {
+    cout << "line " << token->lineNumber << ": "
+         << token->tokenInstance
+         << "\tid: " << token->tokenID << " "
+         << scanner.tokenNames[token->tokenID] << "\n"
+         << endl;
+  }
+}
+
+Token* Parser::getTokenFromScanner() {
+  Scanner scanner;
+  Token *token;
+
+  token = scanner.getToken(this->input);
+
+  cout << "new token: ";
+  this->printToken(token);
+
+  return token;
+}
+
+bool Parser::isEofToken(Token *token) {
+  if(token->tokenID == EOF_tk) {
+    return true;
+  }
+  return false;
+}
+
+// bool Parser::isInSet(string value, string set)
+// {
+//   string setArray = set.split(' ');
+//   int arrayLength = sizeof(set) / sizeof(set[0]);
+//   for (int i = 0; i < arrayLength; i++)
+//   {
+//     // cout << "keyword: " << this->keywords[i] << endl;
+
+//     if (set[i] == value)
+//     {
+//       // cout << "--> matching reserved word!" << endl;
+//       return true;
+//     }
+//   }
+
+//   return false;
+// }

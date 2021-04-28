@@ -10,7 +10,8 @@ enum tokenIDs
   IDENT_tk,
   NUM_tk,
   KW_tk,
-  OpDelim_tk
+  OpDelim_tk,
+  EOF_tk
 }; // 0, 1, 2, 3
 
 // Types in Alphabet: Identifiers, Keywords, Operators/Delimiters, Integers, (not token) Comments

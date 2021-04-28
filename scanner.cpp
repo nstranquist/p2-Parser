@@ -50,15 +50,17 @@ Token *Scanner::getToken(istream *input)
 
     if (this->isEndOfFile)
     {
-      // cout << "end of file. returning null" << endl;
-      return NULL; // or '\0'
+      cout << "end of file." << endl;
+      token->tokenID = EOF_tk;
+      token->tokenInstance = "";
+      return token;
     }
     else if (input->peek() == EOF)
     {
       // cout << "next char is eof" << endl;
       tokenComplete = true;
       this->isEndOfFile = true;
-      nextChar = NULL;
+      nextChar = NULL; // or '\0'
     }
     else
     {
@@ -193,6 +195,11 @@ Token *Scanner::getToken(istream *input)
       token->tokenID = KW_tk; // "reserved"; index 2 (keyword)
       return token;
     }
+  }
+
+  if(tokenComplete && token->tokenInstance == "" && this->isEndOfFile) {
+    cout << "token is empty. making it EOF" << endl;
+    token->tokenID = EOF_tk;
   }
 
   return token;
