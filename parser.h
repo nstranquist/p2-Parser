@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <istream>
 #include "token.h"
+#include "scanner.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ public:
 private:
   istream *input; // for getting the next token from scanner
   Token *token; // the current token lookahead
+  Scanner *scanner; // to maintain an instance for retaining line info information
 
   // Define nonterminal functions (as templates for now)
   void program();

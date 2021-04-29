@@ -13,14 +13,15 @@ void Parser::parser(istream *input)
   cout << "1. Parsing...\n\n";
   this->input = input;
 
-  Scanner scanner;
+  Scanner *scanner = new Scanner();
+  this->scanner = scanner; // save to state to retain info about line numbers and stuff
 
   // Is this already our lookahead token, or do we get one more? --> This is the lookahead.
-  this->token = scanner.getToken(input);
+  this->token = this->scanner->getToken(input);
 
   this->printToken(token);
 
-  program(); 
+  program();
 
   if (token->tokenID == EOF_tk)
   {
@@ -150,7 +151,7 @@ void Parser::expr()
 
   // 2. Either <N> - <expr> or <N>
   N();
-  this->token = this->getTokenFromScanner();
+  // this->token = this->getTokenFromScanner();
 
   if (this->token->tokenInstance == "-") // && this->token->tokenID == OpDelim_tk
   {
@@ -168,7 +169,7 @@ void Parser::N()
   // <A> / <N> | <A> * <N> | <A>
   A();
   // Use lookahead to detect if / or *
-  this->token = this->getTokenFromScanner();
+  // this->token = this->getTokenFromScanner();
   if (this->token->tokenInstance == "/" || this->token->tokenInstance == "*")
   {
     // 1. handle / or * sign
@@ -184,7 +185,7 @@ void Parser::A()
   // <M> + <A> | <M>
   // 1. User First Sets and Lookahead to see if M + A or M
   M();
-  this->token = this->getTokenFromScanner();
+  // this->token = this->getTokenFromScanner();
   if (this->token->tokenInstance == "+") {
     cout << "handling '+' token and processing next" << endl;
     A();
@@ -196,7 +197,8 @@ void Parser::M()
 {
   // * <M> | <R>
   // 1. if mult terminal, consume it and call M
-
+  cout << "Almost at root of expr(). Token: " << endl;
+  this->printToken(this->token);
   if (this->token->tokenInstance == "*") {
     cout << "processing '*' token and processing next" << endl;
     this->token = this->getTokenFromScanner();
@@ -208,26 +210,33 @@ void Parser::M()
 void Parser::R()
 {
   // (<expr) | Identifier | Integer
+  cout << "finally at the root of expr. Token: " << endl;
+  this->printToken(this->token);
+
   // 1. If parens, call expr,
   if (this->token->tokenInstance == "(") {
     expr();
     this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == ")") {
-      cout << "<R> with parens used correctly" << endl;
+      cout << "<R> with parens used correctly. Processing and returning" << endl;
+      this->token = this->getTokenFromScanner();
       return;
     }
     else
       this->throwError("Error: Missing closing ')' from R");
   }
   else if(this->token->tokenID == IDENT_tk) {
-    cout << "Is Identifier in R(). Returning" << endl;
+    cout << "Token: " << this->token->tokenInstance << " Is an Identifier in R(). Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else if(this->token->tokenID == NUM_tk) {
-    cout << "Is Numeric/Integer in R(). Returning" << endl;
+    cout << "Token: " << this->token->tokenInstance << " Is a Numeric/Integer in R(). Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else {
+    cout << "About to throw error. Unrecognized token: " << endl;
     this->printToken(this->token);
     this->throwError("Error: Unrecognized token in R()");
     return;
@@ -385,11 +394,25 @@ void Parser::loop()
   if(this->token->tokenInstance == "loop") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "[") {
-      expr();
-      RO();
-      expr();
       this->token = this->getTokenFromScanner();
+      expr();
+      cout << "expr returned" << endl;
+      RO();
+      cout << "RO returned" << endl;
+      expr();
+      cout << "second expr returned" << endl;
+      this->printToken(this->token);
+      // cout << "getting next token" << endl;
+
+      // this->token = this->getTokenFromScanner();
+      // this->printToken(this->token);
+
+      cout << "In loop, we just got the next token. Should be ']'" << endl;
+      this->printToken(this->token);
       if(this->token->tokenInstance == "]") {
+        this->token = this->getTokenFromScanner();
+        cout << "In loop, token should be next now:"<< endl;
+        this->printToken(this->token);
         stat();
       }
       else
@@ -429,27 +452,32 @@ void Parser::RO()
   // => | =< | == | [==] (3 tokens) | %
   if (this->token->tokenInstance == "=>")
   {
-    cout << "Is =>" << endl;
+    cout << "Is =>  Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else if (this->token->tokenInstance == "=<")
   {
-    cout << "Is =<" << endl;
+    cout << "Is =<  Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else if (this->token->tokenInstance == "==")
   {
-    cout << "Is ==" << endl;
+    cout << "Is ==  Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else if (this->token->tokenInstance == "[" || this->token->tokenInstance == "==" || this->token->tokenInstance == "]")
   {
-    cout << "Is [==]" << endl;
+    cout << "Is [==]  Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else if (this->token->tokenInstance == "%")
   {
-    cout << "Is %" << endl;
+    cout << "Is %  Processing and Returning" << endl;
+    this->token = this->getTokenFromScanner();
     return;
   }
   else
@@ -516,10 +544,9 @@ void Parser::printToken(Token *token)
 }
 
 Token* Parser::getTokenFromScanner() {
-  Scanner scanner;
   Token *token;
 
-  token = scanner.getToken(this->input);
+  token = this->scanner->getToken(this->input);
 
   cout << "new token: ";
   this->printToken(token);
