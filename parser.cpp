@@ -111,7 +111,9 @@ Node* Parser::block()
     this->token = this->getTokenFromScanner();
     Node *varsNode, *statsNode;
     varsNode = vars();
+    subRoot->nodes.push_back(varsNode);
     statsNode = stats();
+    subRoot->nodes.push_back(statsNode);
     cout << "end of stats() in block()" << endl;
     // this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "end") {

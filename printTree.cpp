@@ -19,7 +19,10 @@ void PrintTree::printTree(Node *root)
 }
 
 void PrintTree::printPreorder(Node *root, int level) {
-  if (root==NULL) return;
+  if (root==NULL) {
+    cout << "root is null. returning" << endl;
+    return;
+  }
 
   // cout << "Label: " << root->label << endl;
   cout << std::string((level*2), '-') << root->label
@@ -30,7 +33,6 @@ void PrintTree::printPreorder(Node *root, int level) {
   // (source) https://cal-linux.com/tutorials//vectors.html
   size_t i = 0;
   for(vector<Node*>::iterator t = root->nodes.begin(); t != root->nodes.end(); ++t) {
-    cout << "iteration #" << i << endl;
     printPreorder(root->nodes[i], level + 1);
     ++i;
   }
