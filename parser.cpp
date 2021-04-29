@@ -79,12 +79,14 @@ void Parser::program()
 }
 void Parser::block()
 {
+  cout << "block()" << endl;
   // begin <vars><stats> end
   if(this->token->tokenInstance == "begin") {
     cout << "Processing 'begin' keyword token and consuming next" << endl;
     this->token = this->getTokenFromScanner();
     vars();
     stats();
+    cout << "end of stats() in block()" << endl;
     // this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "end") {
       cout << "block used correctly. Processing 'end' and consuming next" << endl;
@@ -286,7 +288,7 @@ void Parser::stat()
   if(this->token->tokenInstance == "begin") {
     cout << "token is a block. processing and consuming next." << endl;
     block();
-    this->token = this->getTokenFromScanner();
+    // this->token = this->getTokenFromScanner();
     return;
   }
   else if(this->token->tokenInstance == "end") {
@@ -309,6 +311,7 @@ void Parser::stat()
     else if(this->token->tokenInstance == "loop") {
       cout << "token is a loop. processing and consuming next." << endl;
       loop();
+      cout << "returning from loop tho" << endl;
     }
     else if (this->token->tokenInstance == "assign") {
       cout << "token is an assign. processing and consuming next." << endl;
