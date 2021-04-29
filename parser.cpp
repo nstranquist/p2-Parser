@@ -154,6 +154,7 @@ void Parser::expr()
   // 2. Either <N> - <expr> or <N>
   cout << "expr()" << endl;
   N();
+  cout << "token after expr(): "; this->printToken(this->token);
   // this->token = this->getTokenFromScanner();
 
   if (this->token->tokenInstance == "-") // && this->token->tokenID == OpDelim_tk
@@ -177,12 +178,12 @@ void Parser::N()
   cout << "N()" << endl;
 
   A();
-  // Use lookahead to detect if / or *
-  // this->token = this->getTokenFromScanner();
+
   if (this->token->tokenInstance == "/" || this->token->tokenInstance == "*")
   {
     // 1. handle / or * sign
-    cout << "Handling token: " << this->token->tokenInstance << endl;
+    cout << "Token is '/' or '*'. Handling token: " << this->token->tokenInstance << endl;
+    this->token = this->getTokenFromScanner();
     // 2. Call N
     N();
   }
@@ -228,8 +229,9 @@ void Parser::R()
 
   // 1. If parens, call expr,
   if (this->token->tokenInstance == "(") {
-    expr();
+    cout << "Got opening parens. Processing and calling expr()" << endl;
     this->token = this->getTokenFromScanner();
+    expr();
     if(this->token->tokenInstance == ")") {
       cout << "<R> with parens used correctly. Processing and returning" << endl;
       this->token = this->getTokenFromScanner();
