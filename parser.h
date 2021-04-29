@@ -42,7 +42,6 @@ private:
   void printToken(Token *token);
   Token* getTokenFromScanner();
   bool isEofToken(Token *token);
-  // void isInSet(string value, string set);
 };
 
 #endif
