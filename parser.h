@@ -3,43 +3,46 @@
 
 #include <stdio.h>
 #include <istream>
+#include "node.h"
 #include "token.h"
 #include "scanner.h"
+#include "tree.h"
 
 using namespace std;
 
 class Parser
 {
 public:
-  void parser(istream *input); // TODO: change to the tree root Node
+  Node* parser(istream *input); // TODO: change to the tree root Node
 
 private:
   istream *input; // for getting the next token from scanner
   Token *token; // the current token lookahead
   Scanner *scanner; // to maintain an instance for retaining line info information
+  ParseTree *tree; // TODO: rename
 
   // Define nonterminal functions (as templates for now)
-  void program();
-  void block();
-  void vars();
-  void expr();
+  Node* program();
+  Node* block();
+  Node* vars();
+  Node* expr();
 
-  void N();
-  void A();
-  void M();
-  void R();
-  void stats();
-  void mStat();
-  void stat();
+  Node* N();
+  Node* A();
+  Node* M();
+  Node* R();
+  Node* stats();
+  Node* mStat();
+  Node* stat();
 
-  void in();
-  void out();
-  void _if();
-  void loop();
-  void assign();
-  void RO();
-  void label();
-  void _goto();
+  Node* in();
+  Node* out();
+  Node* _if();
+  Node* loop();
+  Node* assign();
+  Node* RO();
+  Node* label();
+  Node* _goto();
 
   void printToken(Token *token);
   Token* getTokenFromScanner();

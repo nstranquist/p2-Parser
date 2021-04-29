@@ -9,3 +9,4 @@ main.o
 scanner.o
 parser.o
 printTree.o
+tree.o

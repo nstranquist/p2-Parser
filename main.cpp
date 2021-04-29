@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "parser.h"
+#include "node.h"
 #include "printTree.h"
 
 using namespace std;
@@ -73,17 +74,17 @@ int main(int argc, char *argv[])
 
   // 2. Call parser() from parser.cpp
   Parser parser;
+  Node *root_node;
 
   try {
-    parser.parser(in);
+    root_node = parser.parser(in);
+    // 3. Call printTree() from printTree.cpp
+    PrintTree printTree;
+    printTree.printTree(root_node);
+    return 0;
   }
   catch (invalid_argument &e) {
     cerr << e.what() << endl;
     return -1;
   }
-
-  // 3. Call printTree() from printTree.cpp
-  printTree();
-
-  return 0;
 }
