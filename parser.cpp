@@ -137,6 +137,7 @@ void Parser::expr()
     cout << "Processing minus operator. Refreshing token" << endl;
     this->token = this->getTokenFromScanner();
     expr();
+    return;
   }
   else
     return;
@@ -145,36 +146,42 @@ void Parser::expr()
 void Parser::N()
 {
   // <A> / <N> | <A> * <N> | <A>
-  // 1. Use lookahead to detect if / or *
-  bool mult = false;
-  bool div = false;
   A();
-  if (mult || div)
+  // Use lookahead to detect if / or *
+  this->token = this->getTokenFromScanner();
+  if (this->token->tokenInstance == "/" || this->token->tokenInstance == "*")
   {
-    // 1. handle / or * sign? terminal, so....
+    // 1. handle / or * sign
+    cout << "Handling token" << endl;
     // 2. Call N
     N();
   }
+  else
+    return;
 }
 void Parser::A()
 {
   // <M> + <A> | <M>
   // 1. User First Sets and Lookahead to see if M + A or M
-  bool useM = false;
   M();
-  if (useM)
-  {
-    // handle '+'
+  this->token = this->getTokenFromScanner();
+  if (this->token->tokenInstance == "+") {
+    cout << "handling '+' token and processing next" << endl;
     A();
   }
+  else
+    return;
 }
 void Parser::M()
 {
   // * <M> | <R>
   // 1. if mult terminal, consume it and call M
-  bool isMult = false;
-  if (isMult)
+
+  if (this->token->tokenInstance == "*") {
+    cout << "processing '*' token and processing next" << endl;
+    this->token = this->getTokenFromScanner();
     M();
+  }
   else
     R();
 }
@@ -182,14 +189,27 @@ void Parser::R()
 {
   // (<expr) | Identifier | Integer
   // 1. If parens, call expr,
-  bool isParens = false;
-  if (isParens)
-  {
+  if (this->token->tokenInstance == "(") {
     expr();
+    this->token = this->getTokenFromScanner();
+    if(this->token->tokenInstance == ")") {
+      cout << "<R> with parens used correctly" << endl;
+      return;
+    }
+    else
+      cout << "Error: Missing closing ')' from R" << endl;
   }
-  else
-  {
-    // Is Identifier or Integer. Return
+  else if(this->token->tokenID == IDENT_tk) {
+    cout << "Is Identifier in R(). Returning" << endl;
+    return;
+  }
+  else if(this->token->tokenID == NUM_tk) {
+    cout << "Is Numeric/Integer in R(). Returning" << endl;
+    return;
+  }
+  else {
+    cout << "Error: Unrecognized token in R()" << endl;
+    this->printToken(this->token);
     return;
   }
 }
@@ -203,10 +223,8 @@ void Parser::mStat()
 {
   // empty | <stat> <mStat>
   // 1. Use lookahead to detect EOF token
-  bool isEOF = false;
-  if (isEOF || !token)
-  {
-    cout << "is EOF or token is empty" << endl;
+  if (this->token->tokenInstance == "") {
+    cout << "Token is empty. returning" << endl;
     return;
   }
   stat();
