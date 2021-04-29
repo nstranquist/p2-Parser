@@ -101,7 +101,7 @@ void Parser::vars()
 {
   // empty | data Identifier := Integer ; <vars>
   // 1. If empty, return;
-
+  cout << "vars()" << endl;
   // Question: What to do if token is 'main'... would not be empty... Can I just use 'else if not data, return' ?
   if(this->token->tokenInstance == "") {
     cout << "token in vars() is empty. returning" << endl;
@@ -150,6 +150,7 @@ void Parser::expr()
   // so if firstSetOfN.includes(token->tokenInstace), call just N()
 
   // 2. Either <N> - <expr> or <N>
+  cout << "expr()" << endl;
   N();
   // this->token = this->getTokenFromScanner();
 
@@ -160,13 +161,19 @@ void Parser::expr()
     expr();
     return;
   }
-  else
+  else {
+    cout << "expr() called as is, nothing returned additionally. Current token: " << endl;
+    this->printToken(this->token);
+    // this->token = this->getTokenFromScanner();
     return;
+  }
 }
 
 void Parser::N()
 {
   // <A> / <N> | <A> * <N> | <A>
+  cout << "N()" << endl;
+
   A();
   // Use lookahead to detect if / or *
   // this->token = this->getTokenFromScanner();
@@ -182,35 +189,39 @@ void Parser::N()
 }
 void Parser::A()
 {
+  cout << "A()" << endl;
   // <M> + <A> | <M>
   // 1. User First Sets and Lookahead to see if M + A or M
   M();
   // this->token = this->getTokenFromScanner();
   if (this->token->tokenInstance == "+") {
     cout << "handling '+' token and processing next" << endl;
+    this->token = this->getTokenFromScanner();
     A();
+    return;
   }
   else
     return;
 }
 void Parser::M()
 {
+  cout << "M()" << endl;
   // * <M> | <R>
   // 1. if mult terminal, consume it and call M
-  cout << "Almost at root of expr(). Token: " << endl;
   this->printToken(this->token);
   if (this->token->tokenInstance == "*") {
     cout << "processing '*' token and processing next" << endl;
     this->token = this->getTokenFromScanner();
     M();
+    return;
   }
   else
     R();
 }
 void Parser::R()
 {
+  cout << "R()" << endl;
   // (<expr) | Identifier | Integer
-  cout << "finally at the root of expr. Token: " << endl;
   this->printToken(this->token);
 
   // 1. If parens, call expr,
@@ -244,14 +255,14 @@ void Parser::R()
 }
 void Parser::stats()
 {
+  cout << "stats()" << endl;
   // <stat> <mStat>
-  cout << "In stats. Current token:" << endl;
-  this->printToken(this->token);
   stat();
   mStat();
 }
 void Parser::mStat()
 {
+  cout << "mStat()" << endl;
   // empty | <stat> <mStat>
   // 1. Use lookahead to detect EOF token
   if (this->token->tokenInstance == "") {
@@ -268,7 +279,7 @@ void Parser::mStat()
 }
 void Parser::stat()
 {
-  cout << "In stat(). Token: " << endl;
+  cout << "stat(). Token: " << endl;
   this->printToken(this->token);
   // <in>; | <out>; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ;
   // 1. Check which category the token is in
@@ -317,10 +328,12 @@ void Parser::stat()
       return;
     }
 
+    cout << "checking for semicolon at the end. Token: " << endl;
+    this->printToken(this->token);
     // Since these aren't blocks, they would all require semi-colons at the end
-    this->token = this->getTokenFromScanner();
+    // this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == ";") {
-      cout << "';' used correctly in stat(). Processing and consuming next" << endl;
+      cout << "';' used correctly in stat(). Processing and consuming next:" << endl;
       this->token = this->getTokenFromScanner();
       return;
     }
@@ -331,12 +344,14 @@ void Parser::stat()
 
 void Parser::in()
 {
+  cout << "in()" << endl;
   // getter Identifier (??)
   // cout << "'in' getter Identifier" << endl;
   if(this->token->tokenInstance == "getter") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenID == IDENT_tk) {
-      cout << "'in' statement used correctly!" << endl;
+      cout << "'in' statement used correctly! Processing and returning" << endl;
+      this->token = this->getTokenFromScanner();
       return;
     }
     else
@@ -347,16 +362,21 @@ void Parser::in()
 }
 void Parser::out()
 {
+  cout << "out()" << endl;
   // outter <expr>
   // cout << "'outter' expr()" << endl;
   if(this->token->tokenInstance == "outter") {
+    cout << "outter expression used correctly. Processing and returning" << endl;
+    this->token = this->getTokenFromScanner();
     expr();
+    return;
   }
   else
     this->throwError("Error: 'outter' missing from outter statement(?)");
 }
 void Parser::_if()
 {
+  cout << "if()" << endl;
   // if [ <expr> <RO> <expr> ] then <stat>
   // cout << "'if' identifier" << endl;
   // cout << "[ expected" << endl;
@@ -371,7 +391,8 @@ void Parser::_if()
       if(this->token->tokenInstance == "]") {
         this->token = this->getTokenFromScanner();
         if(this->token->tokenInstance == "then") {
-          cout << "if statement is FULLY good! if [ ... ] then stat()" << endl;
+          cout << "if statement is FULLY good! if [ ... ] then stat(). Processing and returning" << endl;
+          this->token = this->getTokenFromScanner();
           stat();
         }
         else
@@ -388,6 +409,7 @@ void Parser::_if()
 }
 void Parser::loop()
 {
+  cout << "loop()" << endl;
   // loop [ <expr> <RO> <expr> ] <stat>
   // cout << "'loop' identifier" << endl;
   // cout << "[ expected" << endl;
@@ -426,6 +448,7 @@ void Parser::loop()
 }
 void Parser::assign()
 {
+  cout << "assign()" << endl;
   // assign Identifier := <expr>
   // cout << "'assign' keyword" << endl;
   // cout << "identifier expected" << endl;
@@ -435,8 +458,12 @@ void Parser::assign()
     if(this->token->tokenID == IDENT_tk) {
       this->token = this->getTokenFromScanner();
       if(this->token->tokenInstance == ":=") {
-        cout << "'assign' used correctly!" << endl;
+        cout << "'assign' used correctly! Processing and returning next" << endl;
+        this->token = this->getTokenFromScanner();
         expr();
+        cout << "assign() <expr> is over. returning with current token: " << endl;
+        this->printToken(this->token);
+        return;
       }
       else
         this->throwError("Error: ':=' missing from assign statement");
@@ -449,6 +476,7 @@ void Parser::assign()
 }
 void Parser::RO()
 {
+  cout << "RO()" << endl;
   // => | =< | == | [==] (3 tokens) | %
   if (this->token->tokenInstance == "=>")
   {
@@ -488,14 +516,16 @@ void Parser::RO()
 }
 void Parser::label()
 {
+  cout << "label()" << endl;
   // void Identifier
-  cout << "'void' keyword expected, followed by Identifier" << endl;
+  // cout << "'void' keyword expected, followed by Identifier" << endl;
   if(this->token->tokenInstance == "void") {
     cout << "has 'void'. Processing and getting next token" << endl;
     // Next token should be identifier, or error
     this->token = this->getTokenFromScanner();
     if(this->token->tokenID == IDENT_tk) {
-      cout << "next token is Identifier, we are ok!" << endl;
+      cout << "next token is Identifier, we are ok! Processing and returning" << endl;
+      this->token = this->getTokenFromScanner();
       return ;
     }
     else {
@@ -508,6 +538,7 @@ void Parser::label()
 }
 void Parser::_goto()
 {
+  cout << "_goto()" << endl;
   // proc Identifier
   cout << "'proc' keyword expected, followed by Identifier" << endl;
   if(this->token->tokenInstance == "proc") {
@@ -515,7 +546,8 @@ void Parser::_goto()
     // Next token should be identifier, or error
     this->token = this->getTokenFromScanner();
     if(this->token->tokenID == IDENT_tk) {
-      cout << "next token is Identifier, we are ok!" << endl;
+      cout << "next token is Identifier, we are ok! Processing and returning" << endl;
+      this->token = this->getTokenFromScanner();
       return ;
     }
     else {
