@@ -73,7 +73,14 @@ int main(int argc, char *argv[])
 
   // 2. Call parser() from parser.cpp
   Parser parser;
-  parser.parser(in);
+
+  try {
+    parser.parser(in);
+  }
+  catch (invalid_argument &e) {
+    cerr << e.what() << endl;
+    return -1;
+  }
 
   // 3. Call printTree() from printTree.cpp
   printTree();

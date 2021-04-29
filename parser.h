@@ -42,6 +42,7 @@ private:
   void printToken(Token *token);
   Token* getTokenFromScanner();
   bool isEofToken(Token *token);
+  void throwError(string message);
 };
 
 #endif

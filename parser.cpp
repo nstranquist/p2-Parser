@@ -18,6 +18,8 @@ void Parser::parser(istream *input)
   // Is this already our lookahead token, or do we get one more? --> This is the lookahead.
   this->token = scanner.getToken(input);
 
+  this->printToken(token);
+
   program(); 
 
   if (token->tokenID == EOF_tk)
@@ -26,8 +28,9 @@ void Parser::parser(istream *input)
   }
   else
   {
-    cout << "Error, EOF token not found" << endl;
+    this->throwError("Error, EOF token not found");
   }
+
   // nextToken = scanner.getToken(input);
 
   // printToken(token);
@@ -66,32 +69,39 @@ void Parser::program()
 
   vars();
   if(this->token->tokenInstance == "main") {
+    cout << "Process 'main' keyword token and consume next" << endl;
+    this->token = this->getTokenFromScanner();
     block();
   }
   else
-    cout << "Error: 'main' expected in program" << endl;
+    this->throwError("Error: 'main' expected in program");
 }
 void Parser::block()
 {
   // begin <vars><stats> end
   if(this->token->tokenInstance == "begin") {
+    cout << "Processing 'begin' keyword token and consuming next" << endl;
+    this->token = this->getTokenFromScanner();
     vars();
     stats();
-    this->token = this->getTokenFromScanner();
+    // this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "end") {
-      cout << "block used correctly" << endl;
+      cout << "block used correctly. Processing 'end' and consuming next" << endl;
+      this->token = this->getTokenFromScanner();
       return;
     }
     else
-      cout << "Error: 'end' expected after block" << endl;
+      this->throwError("Error: 'end' expected after block");
   }
   else
-    cout << "Error: 'begin' expected at the start of a block" << endl;
+    this->throwError("Error: 'begin' expected at the start of a block");
 }
 void Parser::vars()
 {
   // empty | data Identifier := Integer ; <vars>
   // 1. If empty, return;
+
+  // Question: What to do if token is 'main'... would not be empty... Can I just use 'else if not data, return' ?
   if(this->token->tokenInstance == "") {
     cout << "token in vars() is empty. returning" << endl;
     return;
@@ -105,20 +115,30 @@ void Parser::vars()
         this->token = this->getTokenFromScanner();
         // Check that next is an integer
         if(this->token->tokenID == NUM_tk) {
-          cout << "<vars> used correctly!" << endl;
-          return;
+          this->token = this->getTokenFromScanner();
+          if(this->token->tokenInstance == ";") {
+            cout << "<vars> used correctly! Processing and calling again" << endl;
+            this->token = this->getTokenFromScanner();
+            vars();
+            return;
+          }
+          else
+            this->throwError("Error: ';' missing after Integer in variable declaration");
         }
         else
-          cout << "Error: Integer expected after ':=' in variable declarations" << endl;
+          this->throwError("Error: Integer expected after ':=' in variable declarations");
       }
       else
-        cout << "Error: ':=' expected after Identifier in variable declarations" << endl;
+        this->throwError("Error: ':=' expected after Identifier in variable declarations");
     }
     else
-      cout << "Error: Identifier expected after 'data' in variable declarations" << endl;
+      this->throwError("Error: Identifier expected after 'data' in variable declarations");
   }
-  else
-    cout << "Error: 'data' expected at the beginning of a variable declaration" << endl;
+  else {
+    cout << "Will assume empty <vars> and return" << endl;
+    return;
+    // cout << "Error: 'data' expected at the beginning of a variable declaration" << endl;
+  }
 }
 void Parser::expr()
 {
@@ -152,7 +172,7 @@ void Parser::N()
   if (this->token->tokenInstance == "/" || this->token->tokenInstance == "*")
   {
     // 1. handle / or * sign
-    cout << "Handling token" << endl;
+    cout << "Handling token: " << this->token->tokenInstance << endl;
     // 2. Call N
     N();
   }
@@ -197,7 +217,7 @@ void Parser::R()
       return;
     }
     else
-      cout << "Error: Missing closing ')' from R" << endl;
+      this->throwError("Error: Missing closing ')' from R");
   }
   else if(this->token->tokenID == IDENT_tk) {
     cout << "Is Identifier in R(). Returning" << endl;
@@ -208,14 +228,16 @@ void Parser::R()
     return;
   }
   else {
-    cout << "Error: Unrecognized token in R()" << endl;
     this->printToken(this->token);
+    this->throwError("Error: Unrecognized token in R()");
     return;
   }
 }
 void Parser::stats()
 {
   // <stat> <mStat>
+  cout << "In stats. Current token:" << endl;
+  this->printToken(this->token);
   stat();
   mStat();
 }
@@ -228,15 +250,27 @@ void Parser::mStat()
     return;
   }
   stat();
+  cout << "Stat has been called. Now processing and consuming next(?)" << endl;
+  if(this->token->tokenInstance == "end") {
+    cout << "is end of block. skipping mStat loop" << endl;
+    return;
+  }
   mStat();
 }
 void Parser::stat()
 {
+  cout << "In stat(). Token: " << endl;
+  this->printToken(this->token);
   // <in>; | <out>; | <block> | <if> ; | <loop> ; | <assign> ; | <goto> ; | <label> ;
   // 1. Check which category the token is in
   if(this->token->tokenInstance == "begin") {
     cout << "token is a block. processing and consuming next." << endl;
     block();
+    this->token = this->getTokenFromScanner();
+    return;
+  }
+  else if(this->token->tokenInstance == "end") {
+    cout << "token is 'end'. Returning, will process in block()" << endl;
     return;
   }
   else {
@@ -269,25 +303,27 @@ void Parser::stat()
       label();
     }
     else {
-      cout << "Error: Token could not be identified (yet)" << endl;
+      this->throwError("Error: Token could not be identified (yet)");
       this->printToken(this->token);
+      return;
     }
 
     // Since these aren't blocks, they would all require semi-colons at the end
     this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == ";") {
-      cout << "';' used correctly in stat()" << endl;
+      cout << "';' used correctly in stat(). Processing and consuming next" << endl;
+      this->token = this->getTokenFromScanner();
       return;
     }
     else
-      cout << "Error: ';' expected" << endl;
+      this->throwError("Error: ';' expected");
   }
 }
 
 void Parser::in()
 {
   // getter Identifier (??)
-  cout << "'in' getter Identifier" << endl;
+  // cout << "'in' getter Identifier" << endl;
   if(this->token->tokenInstance == "getter") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenID == IDENT_tk) {
@@ -295,26 +331,26 @@ void Parser::in()
       return;
     }
     else
-      cout << "Error: Identifier expected after 'in' keyword" << endl;
+      this->throwError("Error: Identifier expected after 'in' keyword");
   }
   else
-    cout << "Error: 'in' missing from in statement(?)" << endl;
+    this->throwError("Error: 'in' missing from in statement(?)");
 }
 void Parser::out()
 {
   // outter <expr>
-  cout << "'outer' expr()" << endl;
-  if(this->token->tokenInstance == "outer") {
+  // cout << "'outter' expr()" << endl;
+  if(this->token->tokenInstance == "outter") {
     expr();
   }
   else
-    cout << "Error: 'outer' missing from outer statement(?)" << endl;
+    this->throwError("Error: 'outter' missing from outter statement(?)");
 }
 void Parser::_if()
 {
   // if [ <expr> <RO> <expr> ] then <stat>
-  cout << "'if' identifier" << endl;
-  cout << "[ expected" << endl;
+  // cout << "'if' identifier" << endl;
+  // cout << "[ expected" << endl;
   if(this->token->tokenInstance == "if") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "[") {
@@ -330,22 +366,22 @@ void Parser::_if()
           stat();
         }
         else
-          cout << "Error: 'then' missing from if statement" << endl;
+          this->throwError("Error: 'then' missing from if statement");
       }
       else
-        cout << "Error: ']' missing from if statement" << endl;
+        this->throwError("Error: ']' missing from if statement");
     }
     else
-      cout << "Error: '[' missing from if statement" << endl;
+      this->throwError("Error: '[' missing from if statement");
   }
   else
-    cout << "Error: 'if' missing from if statement(?)" << endl;
+    this->throwError("Error: 'if' missing from if statement(?)");
 }
 void Parser::loop()
 {
   // loop [ <expr> <RO> <expr> ] <stat>
-  cout << "'loop' identifier" << endl;
-  cout << "[ expected" << endl;
+  // cout << "'loop' identifier" << endl;
+  // cout << "[ expected" << endl;
   if(this->token->tokenInstance == "loop") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenInstance == "[") {
@@ -357,20 +393,20 @@ void Parser::loop()
         stat();
       }
       else
-        cout << "Error: ']' missing from loop statement" << endl;
+        this->throwError("Error: ']' missing from loop statement");
     }
     else
-      cout << "Error: '[' missing from loop statement" << endl;
+      this->throwError("Error: '[' missing from loop statement");
   }
   else
-    cout << "Error: 'loop' missing from loop statement(?)" << endl;
+    this->throwError("Error: 'loop' missing from loop statement(?)");
 }
 void Parser::assign()
 {
   // assign Identifier := <expr>
-  cout << "'assign' keyword" << endl;
-  cout << "identifier expected" << endl;
-  cout << ":= expected" << endl;
+  // cout << "'assign' keyword" << endl;
+  // cout << "identifier expected" << endl;
+  // cout << ":= expected" << endl;
   if(this->token->tokenInstance == "assign") {
     this->token = this->getTokenFromScanner();
     if(this->token->tokenID == IDENT_tk) {
@@ -380,13 +416,13 @@ void Parser::assign()
         expr();
       }
       else
-        cout << "':=' missing from assign statement" << endl;
+        this->throwError("Error: ':=' missing from assign statement");
     }
     else
-      cout << "Identifier expected after assign keyword." << endl;
+      this->throwError("Error: Identifier expected after assign keyword.");
   }
   else
-    cout << "'assign' missing from assign statement(?)" << endl;
+    this->throwError("Error: 'assign' missing from assign statement(?)");
 }
 void Parser::RO()
 {
@@ -418,8 +454,7 @@ void Parser::RO()
   }
   else
   {
-    cout << "Error: Symbol Did Not Match. Symbol: " << this->token->tokenInstance << "\n"
-         << endl;
+    this->throwError("Error: Symbol Did Not Match. Symbol: " + this->token->tokenInstance + "\n");
     return;
   }
 }
@@ -436,11 +471,11 @@ void Parser::label()
       return ;
     }
     else {
-      cout << "Error: next token is NOT identifier, we are NOT okay." << endl;
+      this->throwError("Error: next token is NOT identifier, we are NOT okay.");
     }
   }
   else {
-    cout << "Error: 'void' not detected in label()" << endl;
+    this->throwError("Error: 'void' not detected in label()");
   }
 }
 void Parser::_goto()
@@ -456,11 +491,11 @@ void Parser::_goto()
       return ;
     }
     else {
-      cout << "Error: next token is NOT identifier, we are NOT okay." << endl;
+      this->throwError("Error: next token is NOT identifier, we are NOT okay.");
     }
   }
   else {
-    cout << "Error: 'proc' not detected in _goto()" << endl;
+    this->throwError("Error: 'proc' not detected in _goto()");
   }
 }
 
@@ -497,4 +532,8 @@ bool Parser::isEofToken(Token *token) {
     return true;
   }
   return false;
+}
+
+void Parser::throwError(string message) {
+  throw invalid_argument(message);
 }
