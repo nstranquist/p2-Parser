@@ -4,10 +4,10 @@
 parser: main.o parser.o scanner.o printTree.o tree.o
 	g++ main.o parser.o scanner.o printTree.o tree.o -o parser
 
-main.o: main.cpp printTree.h parser.h token.h tree.h
+main.o: main.cpp printTree.h parser.h token.h tree.h node.h
 	g++ -c -Wall main.cpp
 
-parser.o: parser.cpp parser.h token.h table.h tree.h
+parser.o: parser.cpp parser.h token.h table.h tree.h node.h
 	g++ -c -Wall parser.cpp
 
 scanner.o: scanner.cpp scanner.h token.h table.h

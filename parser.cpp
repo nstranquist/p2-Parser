@@ -42,33 +42,9 @@ Node* Parser::parser(istream *input)
     this->throwError("Error, EOF token not found");
   }
 
-  // nextToken = scanner.getToken(input);
-
-  // printToken(token);
-  // if (nextToken)
-  //   printToken(nextToken);
-
-  // program(token);
-
   cout << "Finished Processing\n\n";
 
   return root_node;
-
-  // while (token)
-  // {
-  //   if (!token)
-  //   {
-  //     cout << "Error! Token not existent\n"
-  //          << endl;
-  //     break;
-  //   }
-  //   cout << "line " << token->lineNumber << ": "
-  //        << token->tokenInstance
-  //        << "\tid: " << token->tokenID << " "
-  //        << scanner.tokenNames[token->tokenID] << "\n"
-  //        << endl;
-  //   token = scanner.getToken(input);
-  // }
 }
 
 // Implement the Non-Terminal Functions (20) or 19

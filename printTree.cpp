@@ -27,8 +27,19 @@ void PrintTree::printPreorder(Node *root, int level) {
   // cout << "Label: " << root->label << endl;
   cout << std::string((level*2), '-') << root->label
     << ": " << root->nodes.size() << " nodes, "
-    << root->tokens.size() << " tokens"
-    << endl;
+    << root->tokens.size() << " tokens";
+
+  if(root->tokens.size() > 0) {
+    cout << ": ";
+    // Print All Token Values
+    size_t i = 0;
+    for(vector<Token*>::iterator t = root->tokens.begin(); t != root->tokens.end(); ++t) {
+      cout << (*t)->tokenInstance << " ";
+      ++i;
+    }
+  }
+  cout << "\n";
+
   // Iterate over vectors, from left to right, calling printPreorder() on the vector
   // (source) https://cal-linux.com/tutorials//vectors.html
   size_t i = 0;
