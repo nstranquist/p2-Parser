@@ -148,7 +148,6 @@ Node* ParseTree::insertNode(string label) { // Node *root
 
 bool ParseTree::areNodesEmpty(Node *node) {
   size_t numNodes = node->nodes.size();
-  cout << "number of nodes: " << numNodes << endl;
   if(numNodes == 0) {
     return true;
   }
@@ -157,7 +156,6 @@ bool ParseTree::areNodesEmpty(Node *node) {
 
 bool ParseTree::areTokensEmpty(Node *node) {
   size_t numTokens = node->tokens.size();
-  cout << "number of tokens: " << numTokens << endl;
   if(numTokens == 0) {
     return true;
   }
