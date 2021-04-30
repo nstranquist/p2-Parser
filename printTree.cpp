@@ -48,12 +48,3 @@ void PrintTree::printPreorder(Node *root, int level) {
     ++i;
   }
 }
-
-// void printPreorder(Node *root, int level) {
-//   if (root==NULL) return;
-//   // printf("%*c%d:%-9s ",level*2,' ',level/*, NodeId.info*/); // assume some info printed as string
-//   printf("\n");
-//   // cout << root->data << " ";
-//   printPreorder(root->left,level+1);
-//   printPreorder(root->right,level+1);
-// }

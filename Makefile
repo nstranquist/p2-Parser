@@ -1,5 +1,4 @@
 # Makefile
-# TODO: Add "-82" or whatever Nathen said
 
 parser: main.o parser.o scanner.o printTree.o tree.o
 	g++ main.o parser.o scanner.o printTree.o tree.o -o parser
