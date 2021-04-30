@@ -14,7 +14,7 @@ ParseTree::ParseTree() {
 Node* ParseTree::createNode(string label) {
   Node *node = new Node();
 
-  cout << "creating node with label: " << label << endl;
+  // cout << "creating node with label: " << label << endl;
   node->label = label;
 
   return node;
@@ -79,9 +79,10 @@ void ParseTree::printNode(Node *node) {
     cout << "node is null" << endl;
     return;
   }
-  cout << "Printing Node in tree.cpp" << endl;
+
   cout << "Node: Label: " << node->label << endl;
   cout<< "Tokens: " << endl;
+  
   int i = 1;
   // Print Tokens
   for(vector<Token*>::iterator token_iterator = node->tokens.begin(); token_iterator != node->tokens.end(); ++token_iterator) {
