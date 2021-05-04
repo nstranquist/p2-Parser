@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
+#include <stdexcept>
 
 #include "parser.h"
 #include "node.h"
@@ -10,7 +11,6 @@
 
 using namespace std;
 
-// TODO: Change invocation to be: "frontEnd [file]"
 // TODO: Account for the c-string error and <stdio.h> error Hauschild found in P1 (and fix it)
 int main(int argc, char *argv[])
 {
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   else if (argc == 2)
   {
     string fileName = argv[1];
-    out.open(fileName);
+    out.open(fileName.c_str());
     in = &out;
 
     cout << "\n0. Reading your file...\n\n";
@@ -36,8 +36,9 @@ int main(int argc, char *argv[])
       // Before error, check if .fs is being added or not
       if (fileName.find(".fs") == std::string::npos)
       {
+        fileName = fileName + ".fs";
         // try one more time to open the file
-        out.open(fileName + ".fs");
+        out.open(fileName.c_str());
         in = &out;
 
         if (!out.is_open())
